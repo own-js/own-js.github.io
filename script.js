@@ -2,20 +2,31 @@ var gameData = {
     gold: 0,
     goldPerClick: 1,
     goldUpgradePerClickCost: 10,
+    autoMiners: 1,
+    autoMinersPurchaseCost: 20
 }
-
+const perClickUpgrade = document.getElementById("perClickUpgrade")
+const goldMined = document.getElementById("goldMined")
+const buyAutoMinersButton = document.getElementById("buyAutoMinersButton")
 var savegame = JSON.parse(localStorage.getItem("goldMinerSave"))
 if (savegame !== null) {
     gameData = savegame
-    document.getElementById("perClickUpgrade").innerHTML = " Upgrade Pickaxe (Currently Level " + gameData.goldPerClick + ") Cost: "+ gameData.goldUpgradePerClickCost + " Gold"
-    document.getElementById("goldMined").innerHTML = gameData.gold + " Gold Mined"
+    perClickUpgrade.innerHTML = " Upgrade Pickaxe (Currently Level " + gameData.goldPerClick + ") Cost: "+ gameData.goldUpgradePerClickCost + " Gold"
+    goldMined.innerHTML = gameData.gold + " Gold Mined"
 }
 function mineGold()
 {
     gameData.gold += gameData.goldPerClick
-    document.getElementById("goldMined").innerHTML = gameData.gold + " Gold Mined"
+    goldMined.innerHTML = gameData.gold + " Gold Mined"
 }
-
+function autoMinersMine()
+{
+        let randomDelayAutoMiner = Math.floor(Math.random() * (400 - 100 + 1)) + 100;
+        setTimeout(function() {
+            gameData.gold += gameData.goldPerClick * gameData.autoMiners
+       }, randomDelayAutoMiner);
+       goldMined.innerHTML = gameData.gold + " Gold Mined"
+}
 function buyGoldPerClick() 
 {
     if (gameData.gold >= gameData.goldUpgradePerClickCost) 
@@ -23,13 +34,23 @@ function buyGoldPerClick()
         gameData.gold -= gameData.goldUpgradePerClickCost
         gameData.goldPerClick++
         gameData.goldUpgradePerClickCost *= 2
-        document.getElementById("perClickUpgrade").innerHTML = " Upgrade Pickaxe (Currently Level " + gameData.goldPerClick + ") Cost: "+ gameData.goldUpgradePerClickCost + " Gold"
-        document.getElementById("goldMined").innerHTML = gameData.gold + " Gold Mined"
+        perClickUpgrade.innerHTML = " Upgrade Pickaxe (Currently Level " + gameData.goldPerClick + ") Cost: "+ gameData.goldUpgradePerClickCost + " Gold"
+        goldMined.innerHTML = gameData.gold + " Gold Mined"
     }
 }
-
+function buyAutoMiners()
+{
+    if (gameData.gold >= gameData.autoMinersPurchaseCost) 
+    {
+        gameData.gold -= gameData.autoMinersPurchaseCost
+        gameData.autoMiners++
+        gameData.autoMinersPurchaseCost *= 2
+        buyAutoMinersButton.innerHTML = " Buy Auto Miner (Current Auto Miners " + gameData.autoMiners + ") Cost: "+ gameData.autoMinersPurchaseCost + " Gold"
+        goldMined.innerHTML = gameData.gold + " Gold Mined"
+    }
+}
 var mainGameLoop = window.setInterval(function() {
-    mineGold()
+    autoMinersMine()
 }, 1000)
 
 
