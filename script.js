@@ -1,14 +1,13 @@
-var savegame = JSON.parse(localStorage.getItem("goldMinerSave"))
-if (savegame !== null) {
-  gameData = savegame
-}
-
 var gameData = {
     gold: 0,
     goldPerClick: 1,
     goldUpgradePerClickCost: 10,
 }
 
+var savegame = JSON.parse(localStorage.getItem("goldMinerSave"))
+if (savegame !== null) {
+  gameData = savegame
+}
 function mineGold()
 {
     gameData.gold += gameData.goldPerClick
