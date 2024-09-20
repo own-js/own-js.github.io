@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dot and Coins Game</title>
+    <style>
+        html, body {
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            margin: 0;
+        }
+        #gameCanvas {
+            background-color: #191e28;
+           
+        }
+        .coin {
+            background-color: gold;
+            position: absolute;
+            width: 20px;
+            height: 20px;
+        }
+        .dot {
+            background-color: green;
+            position: absolute;
+            width: 20px;
+            height: 20px;
+        }
+        #score {
+            font-size: 24px;
+            margin: 10px;
+        }
+        #upgrade {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        #upgrade:disabled {
+            background-color: gray;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="600" height="600"></canvas>
+    <div id="score">Score: 0</div>
+    <button id="upgrade" disabled>Upgrade (Cost: 5)</button>
+    <script>
+        const scoreDisplay = document.getElementById('score');
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const gridSize = 31;
+        const dotSize = 20;
+        const upgradeButton = document.getElementById('upgrade');
+        const coinSize = 20;
+        let dot = { x: 280, y: 280};
+        let coins = [];
+        let currentCoins = 0;
+        let coinsCollected = 0;
+		    let coinCollect = 1;
+        let maxCoins = 10;
+        function createCoin() {
+                if (currentCoins <= maxCoins){
+                            const x = Math.floor(Math.random() * (gridSize - 1)) * coinSize;
+           				 	const y = Math.floor(Math.random() * (gridSize - 1)) * coinSize;
+            				coins.push({ x, y });
+            				currentCoins++;
+                }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw the dot
+            ctx.fillStyle = 'green';
+            ctx.fillRect(dot.x, dot.y, dotSize, dotSize);
+
+            // Draw coins
+            ctx.fillStyle = 'gold';
+            for (const coin of coins) {
+                ctx.fillRect(coin.x, coin.y, coinSize, coinSize);
+            }
+        }
+
+        function update() {
+            for (let i = coins.length - 1; i >= 0; i--) {
+                const coin = coins[i];
+                if (dot.x < coin.x + coinSize &&
+                    dot.x + dotSize > coin.x &&
+                    dot.y < coin.y + coinSize &&
+                    dot.y + dotSize > coin.y) {
+                    coins.splice(i, 1);
+                    coinsCollected = coinsCollected + coinCollect;
+                    currentCoins--;
+                    createCoin();
+                    scoreDisplay.textContent = `Score: ${coinsCollected}`;
+                }
+            }
+
+            draw();
+        }
+
+        function moveDot(dx, dy) {
+            dot.x = Math.max(0, Math.min(dot.x + dx, canvas.width - dotSize));
+            dot.y = Math.max(0, Math.min(dot.y + dy, canvas.height - dotSize));
+            update();
+        }
+
+        function handleKeyDown(event) {
+            switch (event.key) {
+                case 'w':
+                    moveDot(0, -coinSize);
+                    break;
+                case 's':
+                    moveDot(0, coinSize);
+                    break;
+                case 'a':
+                    moveDot(-coinSize, 0);
+                    break;
+                case 'd':
+                    moveDot(coinSize, 0);
+                    break;
+            }
+        }
+        window.addEventListener('keydown', handleKeyDown);
+
+        // Initialize game
+        
+        draw();
+        setInterval(update, 200);
+        setInterval(createCoin, 200);
+        
+    </script>
+</body>
+</html>
+

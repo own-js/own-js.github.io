@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clicker Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #clicker {
+            padding: 20px 40px;
+            font-size: 20px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        #upgrade {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        #upgrade:disabled {
+            background-color: gray;
+            cursor: not-allowed;
+        }
+        #autoClicker {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        #autoClicker:disabled {
+            background-color: gray;
+            cursor: not-allowed;
+        }
+        #score {
+            font-size: 24px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Clicker Game</h1>
+    <div id="score">Score: 0</div>
+    <button id="clicker">Click Me!</button>
+    <button id="upgrade" disabled>Upgrade (Cost: 5)</button>
+    <button id="autoClicker" disabled>Autoclicker (Cost: 50)</button>
+    <script>
+    	  let upgradeCost = 5;
+        let autoClickerUpgradeCost = 50;
+        let score = 0;
+        let currentAutoClickers = 0;
+        let clickValue = 1;
+        let autoClickerUpgradeCostScientific = autoClickerUpgradeCost.toExponential();
+        let scoreScientific = score.toExponential();
+        let upgradeScientific = upgradeCost.toExponential();
+        const upgradeExponent = 1.05;
+        const autoClickerUpgradeExponent = 1.09;
+        const autoClickerUpgradeDisplay = document.getElementById('autoClicker')
+        const scoreDisplay = document.getElementById('score');
+        const clickerButton = document.getElementById('clicker');
+        const upgradeButton = document.getElementById('upgrade');
+		
+        function updateScore() {
+            if (score >= 100000){
+            scoreScientific = score.toExponential();
+            upgradeScientific = upgradeCost.toExponential();
+            autoClickerUpgradeCostScientific = autoClickerUpgradeCost.toExponential();
+            upgradeButton.textContent = `Upgrade (Cost: ${upgradeScientific})`;
+            scoreDisplay.textContent = `Score: ${scoreScientific}`;  
+            autoClickerUpgradeDisplay.textContent = `AutoClicker (Cost: ${autoClickerUpgradeCostScientific})`;    
+            } else {
+            autoClickerUpgradeDisplay.textContent = `AutoClicker (Cost: ${autoClickerUpgradeCost})`;
+            upgradeButton.textContent = `Upgrade (Cost: ${upgradeCost})`;
+            scoreDisplay.textContent = `Score: ${score}`;
+            }
+            if (score >= autoClickerUpgradeCost) {
+              autoClickerUpgradeDisplay.disabled = false;
+            } else {
+              autoClickerUpgradeDisplay.disabled = true;
+            }
+            if (score >= upgradeCost) {
+                upgradeButton.disabled = false;
+            } else {
+                upgradeButton.disabled = true;
+            }
+        }
+        function autoClickers(){
+          if (currentAutoClickers >= 1){
+            score += (clickValue * currentAutoClickers);
+            updateScore();
+          }
+        }
+        clickerButton.addEventListener('click', () => {
+            score += clickValue;
+            updateScore();
+        });
+
+        upgradeButton.addEventListener('click', () => {
+            if (score >= upgradeCost) {
+                score -= upgradeCost;
+                clickValue += 1;
+                upgradeCost = Math.ceil((upgradeCost + 5) ** upgradeExponent)   
+                updateScore();
+            }
+        });
+        autoClickerUpgradeDisplay.addEventListener('click', () => {
+          if (score >= autoClickerUpgradeCost) {
+            score-= autoClickerUpgradeCost;
+            currentAutoClickers++;
+            autoClickerUpgradeCost = Math.ceil(autoClickerUpgradeCost ** autoClickerUpgradeExponent);
+            updateScore();
+          }
+        });
+        let checkAutoClickers = setInterval(autoClickers, 1000)
+        updateScore();
+    </script>
+
+</body>
+</html>
