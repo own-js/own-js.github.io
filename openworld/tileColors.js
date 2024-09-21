@@ -1,5 +1,7 @@
 const tileColors = [
-    ['#FF5733', '#33FF57'],  // Hardcoded row 1
-    [null, '#A633FF'],        // Partially hardcoded row 2
+    ['#FF5733', '#33FF57'],
+    ['random', '#A633FF'],
+    ['random', 'random'], // Both will be randomized
 ];
+
 export default tileColors;

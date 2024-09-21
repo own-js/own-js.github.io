@@ -72,7 +72,12 @@ function initializeTileColors() {
     for (let y = 0; y < rows; y++) {
         tileColors[y] = tileColors[y] || [];
         for (let x = 0; x < cols; x++) {
-            tileColors[y][x] = tileColors[y][x] || getRandomColor();
+            // Check for 'random' keyword
+            if (tileColors[y][x] === 'random') {
+                tileColors[y][x] = getRandomColor();
+            } else {
+                tileColors[y][x] = tileColors[y][x] || getRandomColor();
+            }
         }
     }
 }
