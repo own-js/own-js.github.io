@@ -3,5 +3,4 @@ const tileColors = [
     ['random', '#A633FF'],
     ['random', 'random'], // Both will be randomized
 ];
-
 export default tileColors;

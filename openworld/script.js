@@ -72,23 +72,18 @@ function initializeTileColors() {
     for (let y = 0; y < rows; y++) {
         tileColors[y] = tileColors[y] || [];
         for (let x = 0; x < cols; x++) {
-            // Check for 'random' keyword
             if (tileColors[y][x] === 'random') {
-                tileColors[y][x] = getRandomColor();
+                tileColors[y][x] = getRandomGreenColor();
             } else {
-                tileColors[y][x] = tileColors[y][x] || getRandomColor();
+                tileColors[y][x] = tileColors[y][x] || '#808080'; // Default grey
             }
         }
     }
 }
 
-function getRandomColor() {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
+function getRandomGreenColor() {
+    const greenShades = ['#A8E6CE', '#DCEDC1', '#FFABAB', '#FFD3B6', '#FF677D', '#D4A5A5', '#392F5A'];
+    return greenShades[Math.floor(Math.random() * greenShades.length)];
 }
 
 function drawWorld() {
