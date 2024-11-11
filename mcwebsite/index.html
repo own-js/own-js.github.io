@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crate Builder</title>
+  <style>
+    /* Overall page style */
+    body {
+      font-family: "Courier New", Courier, monospace;
+      background-color: #1a1a1a;
+      color:cyan;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    h1, h2 {
+      color: #ffcc00;
+      text-shadow: 1px 1px 2px black;
+    }
+
+    /* Form and button styling */
+    label {
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      background-color: #333;
+      color: #00ffcc;
+      border: 2px solid #ffcc00;
+      padding: 5px;
+      font-size: 1em;
+      width: 100%;
+      margin-bottom: 10px;
+      box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.5);
+    }
+
+    button {
+      background-color: #ffcc00;
+      color: #1a1a1a;
+      border: none;
+      padding: 10px 20px;
+      margin-top: 10px;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    }
+
+    button:hover {
+      background-color: #ffd633;
+      color: #333;
+    }
+
+    /* Output area styling */
+    #output {
+      background-color: #333;
+      color: #00ffcc;
+      border: 2px solid #ffcc00;
+      padding: 10px;
+      width: 100%;
+      max-width: 600px;
+      margin-top: 20px;
+      font-size: 0.9em;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    /* Containers for sections */
+    div {
+      background-color: #252525;
+      padding: 20px;
+      margin: 10px 0;
+      width: 100%;
+      max-width: 600px;
+      border-radius: 5px;
+      box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.7);
+    }
+  </style>
+</head>
+<body>
+  <h1>Crate Builder</h1>
+
+  <!-- Form for crate properties -->
+  <div>
+    <h2>Create a Crate</h2>
+    <label for="crateIndex">required: Crate Index (unique):</label>
+    <input type="text" id="crateIndex" required><br>
+
+    <label for="crateName">required: Crate Name:</label>
+    <input type="text" id="crateName" required><br>
+
+    <label for="keyName">required: Key Name:</label>
+    <input type="text" id="keyName" required><br>
+
+    <label for="requiredBlock">required: Required Block (can be any block doesnt matter just the block that helps me identify the crate players wont see or know this block at all):</label>
+    <input type="text" id="requiredBlock" required><br>
+  </div>
+
+  <!-- Form for items -->
+  <div>
+    <h2>Add Items to Crate</h2>
+    <label for="itemChance">required: Item Chance(put the item chance as a percent eg 1 in 1000 is 0.1% the % is needed):</label>
+    <input type="text" id="itemChance"><br>
+
+    <label for="itemDescription">required: Description ( name that shows in the chest so if you want a netherite pick youd do Netherite pickaxe this support color codes):</label>
+    <input type="text" id="itemDescription"><br>
+
+    <label for="texture">required: Texture( this is the texure path of the block if you mess it up i can fix it but the paths are on minecrafts github https://github.com/Mojang/bedrock-samples/tree/main/resource_pack/textures):</label>
+    <input type="text" id="texture"><br>
+
+    <label for="num">required: Quantity:</label>
+    <input type="number" id="num" min="1" value="1" max="255"><br>
+
+    <label for="itemID">required: Item ID (the identifier of the item/block you can get this by doing /give @p and it is what every pops up but with "minecraft:result"):</label>
+    <input type="text" id="itemID"><br>
+
+    <label for="enchantments">not required:Enchantments (comma separated and format is enchant.level so unbreaking I would be unbreaking.1):</label>
+    <input type="text" id="enchantments"><br>
+
+    <label for="nameTag">not required: Custom Name (or leave for default name):</label>
+    <input type="text" id="nameTag"><br>
+
+    <button onclick="addItem()">Add Item to Crate</button>
+  </div>
+
+  <!-- Output area for crate JSON -->
+  <h2>Generated Crate JSON</h2>
+  <pre id="output"></pre>
+  
+  <button onclick="generateCrate()">Generate Crate JSON</button>
+
+  <script>
+    let crateItems = [];
+
+    // Add item to crateItems array
+    function addItem() {
+      const itemChance = document.getElementById("itemChance").value;
+      const itemDescription = document.getElementById("itemDescription").value;
+      const texture = document.getElementById("texture").value;
+      const num = document.getElementById("num").value;
+      const itemID = document.getElementById("itemID").value;
+      const enchantments = document.getElementById("enchantments").value
+        .split(',')
+        .map(e => e.trim())
+        .filter(e => e); // Clean up and split enchantments
+      const nameTag = document.getElementById("nameTag").value || null;
+
+      const newItem = {
+        item_chance: itemChance,
+        description: itemDescription,
+        texture: texture,
+        num: Number(num),
+        item: `ItemTypes.get('${itemID}')`,
+        enchantments: enchantments.length > 0 ? enchantments : null,
+        nameTag: nameTag,
+      };
+
+      crateItems.push(newItem);
+      document.getElementById("output").innerText = JSON.stringify(crateItems, null, 2);
+    }
+
+    // Generate crate JSON
+    function generateCrate() {
+      const crateIndex = document.getElementById("crateIndex").value;
+      const crateName = document.getElementById("crateName").value;
+      const keyName = document.getElementById("keyName").value;
+      const requiredBlock = document.getElementById("requiredBlock").value;
+
+      const crate = {
+        [crateIndex]: {
+          name: crateName,
+          keyName: keyName,
+          requiredBlock: requiredBlock,
+          items: crateItems,
+        }
+      };
+
+      document.getElementById("output").innerText = JSON.stringify(crate, null, 2);
+      crateItems = []; // Reset items after generating JSON
+    }
+  </script>
+</body>
+</html>
